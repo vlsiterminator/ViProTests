@@ -1,0 +1,150 @@
+// Updated input cap of pch. 2014/11/29.
+// Modified subcircuit CD COL with adding a path for RBL
+// Deleted the cap load for RBL. 2014/12/12.
+// Separeted PCH and other input control signal for each read and write port.
+// Added a buf for RBLCOL; Make CSEL to be a pulse the same with WLA; added a load for RBLBM. 2014/12/14.
+// Added the CSEL cap; gate cap is half of differential BL. 2015/1/1.
+// Added ic for mid in bitcell. Made BL and BLB invisible in subcircuit COL. Modified pch gate capacitance model by mutiplying it Colmux+1 times.
+// Increased signal period of pch csel to 3tper. 2015/1/13.
+// Updated bankmux input gate cap. 2015/1/14.
+////Cell name: buf
+subckt buf IN OUT VDD VSS
+parameters wp2=wdef wp1=wdef wn2=wdef wn1=wdef l=ldef
+MP1 (OUTB IN VDD VDD) P_TRANSISTOR width=wp1 length=l
+MN1 (OUTB IN VSS VSS) N_TRANSISTOR width=wn1 length=l
+MP2 (OUT OUTB VDD VDD) P_TRANSISTOR width=8*wp2 length=l
+MN2 (OUT OUTB VSS VSS) N_TRANSISTOR width=8*wn2 length=l
+ends buf
+
+// Cell name: bitcell
+// View name: schematic
+subckt bitcell BL BLB VDDC VSSC WL RBL RWL 
+M3 (QB WL BLB VSSC) PG_TRANSISTOR width=wpg length=lpg 
+M2 (Q WL BL VSSC) PG_TRANSISTOR width=wpg length=lpg 
+M4 (QB Q VSSC VSSC) PD_TRANSISTOR width=wpd length=lpd 
+M1 (Q QB VSSC VSSC) PD_TRANSISTOR width=wpd length=lpd 
+M5 (QB Q VDDC VDDC) PU_TRANSISTOR width=wpu length=lpu 
+M0 (Q QB VDDC VDDC) PU_TRANSISTOR width=wpu length=lpu
+M6 (VSSC QB mid VSSC) PG_TRANSISTOR width=wrd1 length=lrd1 
+M7 (RBL RWL mid VSSC) PG_TRANSISTOR width=wrdpg length=lrdpg 
+M8 (VSSC Q mid1 VSSC) PG_TRANSISTOR width=wrd1 length=lrd1 
+M9 (VDD VSS mid1 VSSC) PG_TRANSISTOR width=wrdpg length=lrdpg 
+ends bitcell
+
+// Cell name: nand2
+// View name: schematic
+subckt nand2 INbot INtop OUT VDD VSS
+parameters wp=2*wdef lp=ldef wn=2*wdef ln=ldef
+M2 (OUT INtop VDD VDD) P_TRANSISTOR width=wp length=lp 
+MP (OUT INbot VDD VDD) P_TRANSISTOR width=wp length=lp 
+M1 (OUT INtop net048 VSS) N_TRANSISTOR width=wn length=ln 
+M3 (net048 INbot VSS VSS) N_TRANSISTOR width=wn length=ln 
+ends nand2
+// End of subcircuit definition.
+
+//Inverter subcircuit
+subckt INV OUT IN VDD VSS
+parameters i
+MP (OUT IN VDD VDD) P_TRANSISTOR width=2*i*wdef length=ldef
+MN (OUT IN VSS VSS) N_TRANSISTOR width=i*wdef length=ldef
+ends INV
+
+//generic inverter chain optimize later
+subckt INVCHAIN IN OUT VDD VSS
+I0 (X1 IN VDD VSS) INV i=1
+I1 (X2 X1 VDD VSS) INV i=4
+I2 (X3 X2 VDD VSS) INV i=16
+I3 (OUT X3 VDD VSS) INV i=48
+ends INVCHAIN
+
+// Cell name: CD
+// View name: schematic
+subckt CD CSEL CSELB PCH RBL RBLCOL VDD VSS
+parameters wncs=wdef lncs=ldef wpcs=wdef lpcs=ldef wpch=6*wdef lpch=ldef
+M7 (RBL PCH VDD VDD) P_TRANSISTOR width=wpch length=lpch
+M8 (RBL CSEL RBLCOL VSS) N_TRANSISTOR width=wncs length=lncs 
+M9 (RBLCOL CSELB RBL VDD) P_TRANSISTOR width=wpcs length=lpcs 
+ends CD
+// End of subcircuit definition.
+
+// Cell name: triinv
+// View name: schematic
+subckt triinv IN OUT TRI_N TRI_P VDD VSS 
+parameters wp=wdef lp=ldef wn=wdef ln=ldef
+M0 (OUT IN net19 VDD) P_TRANSISTOR width=wp length=lp 
+MP (net19 TRI_P VDD VDD) P_TRANSISTOR width=wp length=lp 
+M1 (OUT IN net31 VSS) N_TRANSISTOR width=wn length=ln 
+MN (net31 TRI_N VSS VSS) N_TRANSISTOR width=wn length=ln 
+ends triinv
+// End of subcircuit definition.
+
+// DUT name: BitSlice_test
+
+subckt COL WLA CSEL CSELB PCH RBL RBLCOL VDD VSS
+//IBCA (BL BLB VDD VSS VSS RBL WLA) bitcell
+//IBCD (BL BLB VDD VSS VSS VSS VSS) bitcell m=(NR - 1)
+IBCA (VDD VDD VDD VSS VSS RBL WLA) bitcell
+IBCD (VDD VDD VDD VSS VSS VSS VSS) bitcell m=(NR - 1)
+ICDA (CSEL CSELB PCH RBL RBLCOL VDD VSS) CD 
+//+15 to account for length of wire to periphery
+//CBL (BL 0) capacitor c=cbl*(NR+15)
+//CBLB (BLB 0) capacitor c=cbl*(NR+15)
+CRBL (RBL 0) capacitor c=cbl*(NR+15)
+ends COL
+
+// Cell name :buf2
+subckt buf2 IN OUT VDD VSS
+I0 (X1 IN VDD VSS) INV i=1
+I3 (OUT X1 VDD VSS) INV i=4
+ends buf2
+
+//BC and CD
+ICOL1 (WLA CSEL CSELB PCH RBL RBLCOL VDD VSS) COL
+ICOLD (WLA VSS VDD PCH RBLD RBLCOL VDD VSS) COL m=colMux
+//Added buffer for RBLCOL to drive the input cap of bankmux
+ICOL1_buf (RBLCOL RBLBM VDD VSS) buf2
+
+//Added the CSEL cap; gate cap is half of differential BL.
+capCSEL (CSEL 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)
+capCSELB (CSELB 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)
+// capacitance of Colmux driving the tristate buffer (hardcoded for now assuming pmos 32x min, nmos 16x min)
+// Updated bankmux input gate cap
+cap1 (RBLBM 0) capacitor c=wdef*cg*1e6*5
+
+//IWRD (DIN BL VSS VDD VDD VSS) triinv wp=wdef lp=ldef wn=wdef*10 ln=ldef
+//IWRDB (db BLB VSS VDD VDD VSS) triinv wp=wdef lp=ldef wn=wdef*10 ln=ldef
+
+// Cap calculation for pch- wireCap+pch of active col+pch
+// Deleted the numBanks/2 factor
+//Multiplied gate cap with colMux+1
+capPCH (PCH 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*6*(colMux+1)
+
+//Input drivers for DUT
+VVDD (VDD 0) vsource dc=pvdd
+VVSS (VSS 0) vsource dc=0
+
+VWLA (WLA 0) vsource type=pulse val0=0 val1=pvdd+WLOffset rise=trf fall=trf width=twl period=tper*3 delay=tdly
+
+//Make CSEL and CSELB the same as WLA
+VCSEL (CSEL_IN 0) vsource type=pulse val0=0 val1=pvdd rise=trf fall=trf width=twl period=tper*3 delay=tdly
+VCSELB (CSELB_IN 0) vsource type=pulse val0=pvdd val1=0 rise=trf fall=trf width=twl period=tper*3 delay=tdly
+//VCSEL (CSEL 0) vsource dc=0
+//VCSELB (CSELB 0) vsource dc=pvdd
+
+;0.1n added to PCH pulse width, since PCH should go low after CSEL and CSELB switch so that the sensed differential shouldn't get corrupted
+VPCH (PCH_IN 0) vsource type=pulse val0=0 val1=pvdd rise=trf fall=trf width=(twl)+0.2n period=tper*3 delay=tdly-0.2n
+
+//Idb (db DIN_IN VDD VSS) INV i=1
+IPCH1 (PCH_IN PCH VDD VSS) INVCHAIN 
+ICSEL (CSEL_IN CSEL VDD VSS) INVCHAIN 
+ICSELB (CSELB_IN CSELB VDD VSS) INVCHAIN 
+//VDIN (DIN_IN 0) vsource dc=0
+//VWEN (WEN_IN 0) vsource dc=0
+//IB7 (DIN_IN DIN VDD VSS) buf
+//IB8 (WEN_IN WEN VDD VSS) INVCHAIN
+
+ic ICOL1.IBCA.Q=0 ICOL1.IBCD.Q=pvdd ICOLD.IBCA.Q=0 ICOLD.IBCD.Q=0 RBL=pvdd RBLD=pvdd RBLCOL=pvdd 
+ic ICOL1.IBCA.mid=0 ICOL1.IBCD.mid=0 ICOLD.IBCA.mid=0 ICOLD.IBCD.mid=0
+ic ICOL1.IBCA.mid1=0 ICOL1.IBCD.mid1=0 ICOLD.IBCA.mid1=0 ICOLD.IBCD.mid1=0
+ic RBLBM=pvdd 
+myOption options pwr=all pivotdc=yes
