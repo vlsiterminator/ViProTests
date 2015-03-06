@@ -95,7 +95,10 @@ VVDD (VDD 0) vsource dc=pvdd
 VVSS (VSS 0) vsource dc=0
 
 // Cap calculation for pch (assumes size of pch is 6x min, 3 devices)
-capPCH (PCH 0) capacitor c=ws*cwl+wdef*cg*1e6*(ws-1)*6*3
+//capPCH (PCH 0) capacitor c=ws*cwl+wdef*cg*1e6*(ws-1)*6*3
+//Added an PCH input buffer. ColMux number of columns share the same PCH buf.
+capPCH1 (PCH_int 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*6
+IPCH_buf (PCH_int PCH VDD VSS) buf wn1=2*wdef wp1=4*wdef wn2=1*wdef wp2=2*wdef
 // cap calculation for WEN (assumes write driver nmos sized 10x min, pmos min
 //capWEN (WEN 0) capacitor c=numBanks/2*ws*cwl+wdef*cg*1e6*(ws-1)*22*2 
 capWEN (WEN 0) capacitor c=ws*cwl*(colMux+1)+wdef*cg*1e6*(ws-1)*23
@@ -109,7 +112,7 @@ VPCH (PCH_IN 0) vsource type=pulse val0=0 val1=pvdd rise=trf fall=trf width=tper
 VDIN (DIN_IN 0) vsource dc=0
 Idb (db DIN VDD VSS) INV i=1
 VWEN (WEN_IN 0) vsource type=pulse val0=0 val1=pvdd rise=trf fall=trf width=tper/1.5 period=tper*1.5 delay=0
-IPCH1 (PCH_IN PCH VDD VSS) INVCHAIN
+IPCH1 (PCH_IN PCH_int VDD VSS) INVCHAIN
 IB7 (DIN_IN DIN VDD VSS) buf
 IWEN (WEN_IN WEN VDD VSS) INVCHAIN
 

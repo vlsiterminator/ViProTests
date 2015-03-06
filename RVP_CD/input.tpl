@@ -198,7 +198,7 @@ while( (rows <= maxRows)
     );; endif 10T
     ;; Added power for col buf and CSEL driver. 2014/12/14.
     if( bcType=="8T1r1w_single" then
-    avg_pwr_pch_buf= average(getData("IPCH1:pwr"))
+	    avg_pwr_pch_buf= average(getData("IPCH1:pwr"))+ <ws>*average(getData("IPCH_buf:pwr"))
 		dly_pch_r=cross(v("RBL") VDD*.95 1 'rising) - cross(v("PCH") VDD/2 1 'falling)
 	avg_pwr_r = average(getData("ICOL1.ICDA:pwr")) 
     avg_pwr_colbuf=  average(getData("ICOL1_buf:pwr"))
@@ -210,7 +210,7 @@ while( (rows <= maxRows)
     );; endif 8T
     ;; energy is multiplied by 2 for 2 read ports.
     if( bcType=="10T2r1w_single" then
-    avg_pwr_pch_buf= average(getData("IPCH1:pwr"))
+	    avg_pwr_pch_buf= average(getData("IPCH1:pwr"))+ <ws>*average(getData("IPCH_buf:pwr"))
 		dly_pch_r=cross(v("RBL") VDD*.95 1 'rising) - cross(v("PCH") VDD/2 1 'falling)
 	avg_pwr_r = average(getData("ICOL1.ICDA:pwr")) 
     avg_pwr_colbuf=  average(getData("ICOL1_buf:pwr"))
@@ -230,7 +230,7 @@ while( (rows <= maxRows)
 	energy_inter_r=1.3*<tper>*avg_pwr_pch_buf
     );; endif 12T
     if( bcType=="12T2r2w_single" then
-    avg_pwr_pch_buf= average(getData("IPCH1:pwr"))
+	    avg_pwr_pch_buf= average(getData("IPCH1:pwr"))+ <ws>*average(getData("IPCH_buf:pwr"))
 		dly_pch_r=cross(v("RBL") VDD*.95 1 'rising) - cross(v("PCH") VDD/2 1 'falling)
 	avg_pwr_r = average(getData("ICOL1.ICDA:pwr")) 
     avg_pwr_colbuf=  average(getData("ICOL1_buf:pwr"))
@@ -377,13 +377,13 @@ while( (rows <= maxRows)
 	avg_pwr_int_w=average(getData("IWEN:pwr"))+average(getData("IPCH1:pwr"))+ <ws>*average(getData("IPCH_buf:pwr"))
 		)
         if( bcType=="10T2r1w_single" then
-	avg_pwr_int_w=average(getData("IWEN:pwr"))+average(getData("IPCH1:pwr"))
+	avg_pwr_int_w=average(getData("IWEN:pwr"))+average(getData("IPCH1:pwr"))+ <ws>*average(getData("IPCH_buf:pwr"))
         )
         if( bcType=="10T2r1w_diff" then
 	avg_pwr_int_w=average(getData("IWEN:pwr"))+average(getData("IPCH1:pwr"))+ <ws>*average(getData("IPCH_buf:pwr"))
         )
         if( bcType=="8T1r1w_single" then
-	avg_pwr_int_w=average(getData("IWEN:pwr"))+average(getData("IPCH1:pwr"))
+	avg_pwr_int_w=average(getData("IWEN:pwr"))+average(getData("IPCH1:pwr"))+ <ws>*average(getData("IPCH_buf:pwr"))
 		)
         if( bcType=="8T1r1w_diff" then
 	avg_pwr_int_w=average(getData("IWEN:pwr"))+average(getData("IPCH1:pwr"))+ <ws>*average(getData("IPCH_buf:pwr"))
@@ -392,7 +392,7 @@ while( (rows <= maxRows)
 	avg_pwr_int_w=average(getData("IWEN:pwr"))+average(getData("IPCH1:pwr"))+ <ws>*average(getData("IPCH_buf:pwr"))
         )
         if( bcType=="12T2r2w_single" then
-	avg_pwr_int_w=average(getData("IWEN:pwr"))+average(getData("IPCH1:pwr"))
+	avg_pwr_int_w=average(getData("IWEN:pwr"))+average(getData("IPCH1:pwr"))+ <ws>*average(getData("IPCH_buf:pwr"))
         )
 	avg_pwr_w = average(getData("ICOL1.ICDA:pwr"))
 	

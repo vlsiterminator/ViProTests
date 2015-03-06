@@ -117,7 +117,10 @@ cap1 (RBLBM 0) capacitor c=wdef*cg*1e6*5
 // Deleted the numBanks/2 factor
 ;;Deleted the colMux+1 factor, because PCH has the instance for colMux.
 //Multiplied gate cap with colMux+1 times
-capPCH (PCH 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*6*(colMux+1)
+//capPCH (PCH 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*6*(colMux+1)
+//Added an PCH input buffer. ColMux number of columns share the same PCH buf.
+capPCH1 (PCH_int 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*6
+IPCH_buf (PCH_int PCH VDD VSS) buf wn1=2*wdef wp1=4*wdef wn2=1*wdef wp2=2*wdef
 
 //Input drivers for DUT
 VVDD (VDD 0) vsource dc=pvdd
@@ -136,7 +139,7 @@ VCSELB (CSELB_IN 0) vsource type=pulse val0=pvdd val1=0 rise=trf fall=trf width=
 VPCH (PCH_IN 0) vsource type=pulse val0=0 val1=pvdd rise=trf fall=trf width=(twl)+0.2n period=tper*3 delay=tdly-0.2n
 
 //Idb (db DIN_IN VDD VSS) INV i=1
-IPCH1 (PCH_IN PCH VDD VSS) INVCHAIN
+IPCH1 (PCH_IN PCH_int VDD VSS) INVCHAIN
 ICSEL (CSEL_IN CSEL VDD VSS) INVCHAIN 
 ICSELB (CSELB_IN CSELB VDD VSS) INVCHAIN 
 //VDIN (DIN_IN 0) vsource dc=0
