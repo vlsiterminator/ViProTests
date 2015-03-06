@@ -86,7 +86,7 @@ subckt COL WLA CSEL CSELB  PCH RBL RBLCOL VDD VSS
 //IBCA (BL BLB VDD VSS VSS RBL WLA) bitcell
 //IBCD (BL BLB VDD VSS VSS VSS VSS) bitcell m=(NR - 1)
 IBCA (VDD VDD VDD VSS VSS RBL WLA) bitcell
-IBCD (VDD VDD VDD VSS VSS VSS VSS) bitcell m=(NR - 1)
+IBCD (VDD VDD VDD VSS VSS RBL VSS) bitcell m=(NR - 1)
 ICDA (CSEL CSELB PCH RBL RBLCOL VDD VSS) CD 
 //+15 to account for length of wire to periphery
 //CBL (BL 0) capacitor c=cbl*(NR+15) 
