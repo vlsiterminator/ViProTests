@@ -1,0 +1,159 @@
+//Modified WEN gate cap model
+////Cell name: buf
+subckt buf IN OUT VDD VSS
+parameters wp2=wdef wp1=wdef wn2=wdef wn1=wdef l=ldef
+MP1 (OUTB IN VDD VDD) P_TRANSISTOR width=wp1 length=l
+MN1 (OUTB IN VSS VSS) N_TRANSISTOR width=wn1 length=l
+MP2 (OUT OUTB VDD VDD) P_TRANSISTOR width=8*wp2 length=l
+MN2 (OUT OUTB VSS VSS) N_TRANSISTOR width=8*wn2 length=l
+ends buf
+
+// Cell name: bitcell
+// View name: schematic
+subckt bitcell BL BLB VDDC VSSC WL RBL RWL 
+M3 (QB WL BLB VSSC) PG_TRANSISTOR width=wpg length=lpg 
+M2 (Q WL BL VSSC) PG_TRANSISTOR width=wpg length=lpg 
+M4 (QB Q VSSC VSSC) PD_TRANSISTOR width=wpd length=lpd 
+M1 (Q QB VSSC VSSC) PD_TRANSISTOR width=wpd length=lpd 
+M5 (QB Q VDDC VDDC) PU_TRANSISTOR width=wpu length=lpu 
+M0 (Q QB VDDC VDDC) PU_TRANSISTOR width=wpu length=lpu 
+M6 (VSSC QB mid VSSC) PG_TRANSISTOR width=wrd1 length=lrd1 
+M7 (RBL RWL mid VSSC) PG_TRANSISTOR width=wrdpg length=lrdpg 
+ends bitcell
+
+// Cell name: triinv
+// View name: schematic
+subckt triinv IN OUT TRI_N TRI_P VDD VSS
+parameters wp=4*wdef lp=ldef wn=2*wdef ln=ldef
+M0 (OUT IN net19 VDD) P_TRANSISTOR width=wp length=lp 
+MP (net19 TRI_P VDD VDD) P_TRANSISTOR width=wp length=lp 
+M1 (OUT IN net31 VSS) N_TRANSISTOR width=wn length=ln 
+MN (net31 TRI_N VSS VSS) N_TRANSISTOR width=wn length=ln 
+ends triinv
+// End of subcircuit definition.
+
+// Cell name: nand2
+// View name: schematic
+subckt nand2 INbot INtop OUT VDD VSS
+parameters wp=2*wdef lp=ldef wn=2*wdef ln=ldef
+M2 (OUT INtop VDD VDD) P_TRANSISTOR width=wp length=lp 
+MP (OUT INbot VDD VDD) P_TRANSISTOR width=wp length=lp 
+M1 (OUT INtop net048 VSS) N_TRANSISTOR width=wn length=ln 
+M3 (net048 INbot VSS VSS) N_TRANSISTOR width=wn length=ln 
+ends nand2
+// End of subcircuit definition.
+
+// Cell name: nor2
+// View name: schematic
+subckt nor2 INbot INtop OUT VDD VSS
+parameters wp=2*wdef lp=ldef wn=wdef ln=ldef
+M2 (net INtop VDD VDD) P_TRANSISTOR width=wp length=lp 
+MP (OUT INbot net VDD) P_TRANSISTOR width=wp length=lp 
+M1 (OUT INtop VSS VSS) N_TRANSISTOR width=wn length=ln 
+M3 (OUT INbot VSS VSS) N_TRANSISTOR width=wn length=ln 
+ends nor2
+// End of subcircuit definition.
+
+// Cell name: CD
+// View name: schematic
+subckt CD LBL LBLB GBL GBLB LBL_SEL PCH VDD VSS
+parameters wncs=6*wdef lncs=ldef wpcs=6*wdef lpcs=ldef wpch=2*wdef lpch=ldef
+
+M1 (GBL PCH VDD VDD) P_TRANSISTOR width=wpch length=lpch 
+M2 (GBLB PCH VDD VDD) P_TRANSISTOR width=wpch length=lpch 
+M3 (GBL PCH GBLB VDD) P_TRANSISTOR width=wpch length=lpch
+M4 (LBL PCH VDD VDD) P_TRANSISTOR width=wpch length=lpch 
+M5 (LBLB PCH VDD VDD) P_TRANSISTOR width=wpch length=lpch 
+M6 (LBL PCH LBLB VDD) P_TRANSISTOR width=wpch length=lpch
+I0 (LBL_SELB LBL_SEL VDD VSS) INV i=1
+I1 (LBL_SELB GBL LBL_drv1 VDD VSS) nor2 wp=3*wdef
+M7 (VSS LBL_drv1 LBL VSS) N_TRANSISTOR width=6*wdef length=ldef
+I2 (LBL_SELB GBLB LBL_drv2 VDD VSS) nor2 wp=3*wdef
+M8 (VSS LBL_drv2 LBLB VSS) N_TRANSISTOR width=10*wdef length=ldef
+ends CD
+// End of subcircuit definition.
+
+//Inverter subcircuit
+subckt INV OUT IN VDD VSS
+parameters i
+MP (OUT IN VDD VDD) P_TRANSISTOR width=2*i*wdef length=ldef
+MN (OUT IN VSS VSS) N_TRANSISTOR width=i*wdef length=ldef
+ends INV
+
+//generic inverter chain optimize later
+subckt INVCHAIN IN OUT VDD VSS
+I0 (X1 IN VDD VSS) INV i=1
+I1 (X2 X1 VDD VSS) INV i=4
+I2 (X3 X2 VDD VSS) INV i=16
+I3 (OUT X3 VDD VSS) INV i=48
+ends INVCHAIN
+
+// DUT name: BitSlice_test
+subckt COL_LBL WLA GBL GBLB LBL_SEL PCH VDD VSS
+//IBCA (BL BLB VDD VSS VSS RBL WLA) bitcell
+//IBCD (BL BLB VDD VSS VSS VSS VSS) bitcell m=(NR - 1)
+IBCA (LBL LBLB VDD VSS WLA VDD VSS) bitcell
+IBCD (LBL LBLB VDD VSS VSS VDD VSS) bitcell m=(NRLBL - 1)
+ICDA (LBL LBLB GBL GBLB LBL_SEL PCH VDD VSS) CD
+//+5 to account for length of wire to periphery
+CLBL (LBL 0) capacitor c=cbl*(NRLBL+5)
+CLBLB (LBLB 0) capacitor c=cbl*(NRLBL+5)
+CGBL (GBL 0) capacitor c=cbl*(NRLBL+5)
+CGBLB (GBLB 0) capacitor c=cbl*(NRLBL+5)
+ends COL_LBL
+
+subckt COL WLA GBL GBLB LBL_SEL PCH VDD VSS
+ICOL_LBL (WLA GBL GBLB LBL_SEL PCH VDD VSS) COL_LBL
+ICOL_LBLD (VSS GBL GBLB VSS PCH VDD VSS) COL_LBL m=(NLBL - 1)
+ends COL
+
+//BC and CD
+ICOL1 (WLA GBL GBLB LBL_SEL PCH VDD VSS) COL
+ICOLD (WLA VDD VDD LBL_SEL PCH VDD VSS) COL m=colMux
+
+IWRD (DIN GBL WEN WENB VDD VSS) triinv wp=wdef lp=ldef wn=wdef*10 ln=ldef
+IWRDB (db GBLB WEN WENB VDD VSS) triinv wp=wdef lp=ldef wn=wdef*10 ln=ldef
+IWENB (WENB WEN VDD VSS) INV i=1
+
+//Input drivers for DUT
+VVDD (VDD 0) vsource dc=pvdd
+VVSS (VSS 0) vsource dc=0
+
+// Cap calculation for pch (assumes size of pch is 6x min, 3 devices)
+;;capPCH (PCH 0) capacitor c=numBanks/2*ws*cwl*(colMux+1)+wdef*cg*1e6*(ws-1)*6*3*(colMux+1)
+;;Don't include Bank number when calculating the cap load, and splitted precharge circuit for each colMux. Modified at 10/29/2014.
+//capPCH1 (PCH 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*6*3*(colMux+1)
+//Added an PCH input buffer. ColMux number of columns share the same PCH buf.
+capPCH1 (PCH_int 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*12
+IPCH_buf (PCH_int PCH VDD VSS) buf wn1=4*wdef wp1=8*wdef wn2=2*wdef wp2=4*wdef
+// cap calculation for WEN (assumes write driver nmos sized 10x min, pmos min, 2 drivers per column) also assumes WEN signal has already been ANDed with the colSel signal
+;;capWEN (WEN 0) capacitor c=numBanks/2*ws*cwl*(colMux+1)+wdef*cg*1e6*(ws-1)*22*2
+capWEN (WEN 0) capacitor c=ws*cwl*(colMux+1)+wdef*cg*1e6*(ws-1)*(10*2+3)
+capLBL_SEL (LBL_SEL 0) capacitor c=ws*cwl*(colMux+1)+wdef*cg*1e6*(ws-1)*(colMux+1)*3
+
+VWLA (WLA 0) vsource type=pulse val0=0 val1=pvdd+WLOffset rise=trf fall=trf width=twl period=tper delay=tdly+5e-10
+
+
+VCSEL (CSEL 0) vsource dc=0
+VCSELB (CSELB 0) vsource dc=pvdd
+VPCH (PCH_IN 0) vsource type=pulse val0=0 val1=pvdd rise=trf fall=trf width=tper/1.5 period=tper*1.5 delay=0
+
+VDIN (DIN_IN 0) vsource dc=0
+Idb (db DIN VDD VSS) INV i=1
+VWEN (WEN_IN 0) vsource type=pulse val0=0 val1=pvdd rise=trf fall=trf width=tper/1.5 period=tper*1.5 delay=0
+//Assume LBL_SEL_IN starting with DFF output and ending with WLA's falling edge.
+VLBL_SEL (LBL_SEL_IN 0) vsource type=pulse val0=0 val1=pvdd rise=trf fall=trf width=tdly+5e-10+twl period=tper*1.5 delay=0
+IPCH1 (PCH_IN PCH_int VDD VSS) INVCHAIN
+IB7 (DIN_IN DIN VDD VSS) buf
+IWEN (WEN_IN WEN VDD VSS) INVCHAIN
+ILBL_SEL (LBL_SEL_IN LBL_SEL VDD VSS) INVCHAIN
+
+ic ICOL1.ICOL_LBL.IBCA.Q=0 ICOL1.ICOL_LBL.IBCD.Q=pvdd ICOLD.ICOL_LBL.IBCA.Q=0 ICOLD.ICOL_LBL.IBCD.Q=pvdd 
+ic ICOL1.ICOL_LBLD.IBCA.Q=0 ICOL1.ICOL_LBLD.IBCD.Q=pvdd ICOLD.ICOL_LBLD.IBCA.Q=0 ICOLD.ICOL_LBLD.IBCD.Q=pvdd 
+ic ICOL1.ICOL_LBL.IBCA.mid=0 ICOL1.ICOL_LBL.IBCD.mid=0 ICOLD.ICOL_LBL.IBCA.mid=0 ICOLD.ICOL_LBL.IBCD.mid=0
+ic ICOL1.ICOL_LBLD.IBCA.mid=0 ICOL1.ICOL_LBLD.IBCD.mid=0 ICOLD.ICOL_LBLD.IBCA.mid=0 ICOLD.ICOL_LBLD.IBCD.mid=0
+ic ICOL1.ICOL_LBL.LBL=pvdd ICOL1.ICOL_LBL.LBLB=pvdd ICOL1.ICOL_LBLD.LBL=pvdd ICOL1.ICOL_LBLD.LBLB=pvdd
+ic ICOLD.ICOL_LBL.LBL=pvdd ICOLD.ICOL_LBL.LBLB=pvdd ICOLD.ICOL_LBLD.LBL=pvdd ICOLD.ICOL_LBLD.LBLB=pvdd
+ic GBL=pvdd GBLB=pvdd
+myOption options pwr=all
+

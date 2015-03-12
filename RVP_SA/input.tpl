@@ -179,6 +179,13 @@ while( (colMux <= maxColMux)
 	dly_sa = 0.0
     dly_inter=0.0
     );;endif
+	if( bcType=="8T1r1w_single_LBL" then	
+	energy_buf=0.0
+	energy_SA = 0.0
+	etot_r = 0.0
+	dly_sa = 0.0
+    dly_inter=0.0
+    );;endif
 	if( bcType=="10T2r1w_single" then	
 	energy_buf=0.0
 	energy_SA = 0.0
