@@ -108,7 +108,7 @@ capPCH (PCH 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*6*4
 VVDD (VDD 0) vsource dc=pvdd
 VVSS (VSS 0) vsource dc=0
 
-VWLA (WLA 0) vsource type=pulse val0=0 val1=pvdd+WLOffset rise=trf fall=trf width=twl period=tper delay=tdly
+VWLA (WLA 0) vsource type=pulse val0=0 val1=pvdd+WLOffset rise=trf fall=trf width=twl period=tper*3 delay=tdly
 
 
 VCSEL (CSEL 0) vsource dc=0

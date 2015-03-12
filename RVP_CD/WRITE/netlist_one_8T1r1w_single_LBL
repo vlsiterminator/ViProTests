@@ -130,7 +130,7 @@ IPCH_buf (PCH_int PCH VDD VSS) buf wn1=2*wdef wp1=4*wdef wn2=1*wdef wp2=2*wdef
 capWEN (WEN 0) capacitor c=ws*cwl*(colMux+1)+wdef*cg*1e6*(ws-1)*(10*2+3)
 capLBL_SEL (LBL_SEL 0) capacitor c=ws*cwl*(colMux+1)+wdef*cg*1e6*(ws-1)*(colMux+1)*3
 
-VWLA (WLA 0) vsource type=pulse val0=0 val1=pvdd+WLOffset rise=trf fall=trf width=twl period=tper delay=tdly+5e-10
+VWLA (WLA 0) vsource type=pulse val0=0 val1=pvdd+WLOffset rise=trf fall=trf width=twl period=tper*1.5 delay=tdly+5e-10
 
 
 VCSEL (CSEL 0) vsource dc=0
