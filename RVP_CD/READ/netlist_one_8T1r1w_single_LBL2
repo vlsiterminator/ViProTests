@@ -104,7 +104,6 @@ ends COL_LBL
 
 subckt COL WLA CSELB PCH RBL_GBL1 RBL_GBL2 VDD VSS
 ICOL_LBL (WLA CSELB PCH RBL_GBL1 VDD VSS) COL_LBL
-ICOL_LBLD (VSS CSELB PCH RBL_GBL1 VDD VSS) COL_LBL m=(NLBL/2 - 1)
 ICOL_LBL2 (VSS CSELB PCH RBL_GBL2 VDD VSS) COL_LBL m=NLBL/2
 //+5 to account for length of wire to periphery
 //CRBL (RBL_GBL 0) capacitor c=cbl*(NR+5)
@@ -118,7 +117,6 @@ ends buf2
 
 //BC and CD
 ICOL1 (WLA CSELB PCH RBL_GBL1 RBL_GBL2 VDD VSS) COL
-ICOLD (WLA VDD PCH RBL_GBL1 RBL_GBL2 VDD VSS) COL m=colMux
 //Added buffer for RBLCOL to drive the input cap of bankmux
 IGBL_SEL (RBL_GBL1 RBL_GBL2 RBL_GBL VDD VSS) nand2
 ICOL1_buf (RBLBM RBL_GBL VDD VSS) INV i=4
@@ -140,8 +138,8 @@ cap1 (RBLBM 0) capacitor c=wdef*cg*1e6*5
 //Multiplied gate cap with colMux+1
 //capPCH (PCH 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*4*(colMux+1)*NLBL
 //Added an PCH input buffer. ColMux number of columns share the same PCH buf.
-capPCH1 (PCH_int 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*12
-IPCH_buf (PCH_int PCH VDD VSS) buf wn1=4*wdef wp1=8*wdef wn2=2*wdef wp2=4*wdef
+capPCH1 (PCH_int 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*6
+IPCH_buf (PCH_int PCH VDD VSS) buf wn1=2*wdef wp1=4*wdef wn2=1*wdef wp2=2*wdef
 
 //Input drivers for DUT
 VVDD (VDD 0) vsource dc=pvdd
@@ -167,11 +165,10 @@ ICSELB (CSELB_IN CSELB VDD VSS) INVCHAIN
 //IB7 (DIN_IN DIN VDD VSS) buf
 //IB8 (WEN_IN WEN VDD VSS) INVCHAIN
 
-ic ICOL1.ICOL_LBL.IBCA.Q=0 ICOL1.ICOL_LBL.IBCD.Q=pvdd ICOLD.ICOL_LBL.IBCA.Q=0 ICOLD.ICOL_LBL.IBCD.Q=0  
-ic ICOL1.ICOL_LBLD.IBCA.Q=0 ICOL1.ICOL_LBLD.IBCD.Q=pvdd ICOLD.ICOL_LBLD.IBCA.Q=0 ICOLD.ICOL_LBLD.IBCD.Q=0  
-ic ICOL1.ICOL_LBL.IBCA.mid=0 ICOL1.ICOL_LBL.IBCD.mid=0 ICOLD.ICOL_LBL.IBCA.mid=0 ICOLD.ICOL_LBL.IBCD.mid=0
-ic ICOL1.ICOL_LBLD.IBCA.mid=0 ICOL1.ICOL_LBLD.IBCD.mid=0 ICOLD.ICOL_LBLD.IBCA.mid=0 ICOLD.ICOL_LBLD.IBCD.mid=0
-ic ICOL1.ICOL_LBL.RBL_LBL=pvdd ICOL1.ICOL_LBLD.RBL_LBL=pvdd
-ic ICOLD.ICOL_LBL.RBL_LBL=pvdd ICOLD.ICOL_LBLD.RBL_LBL=pvdd
+ic ICOL1.ICOL_LBL.IBCA.Q=0 ICOL1.ICOL_LBL.IBCD.Q=pvdd  
+ic ICOL1.ICOL_LBL2.IBCA.Q=0 ICOL1.ICOL_LBL2.IBCD.Q=pvdd  
+ic ICOL1.ICOL_LBL.IBCA.mid=0 ICOL1.ICOL_LBL.IBCD.mid=0 
+ic ICOL1.ICOL_LBL2.IBCA.mid=0 ICOL1.ICOL_LBL2.IBCD.mid=0 
+ic ICOL1.ICOL_LBL.RBL_LBL=pvdd ICOL1.ICOL_LBL2.RBL_LBL=pvdd
 ic RBLBM=pvdd RBL_GBL1=pvdd RBL_GBL2=pvdd
 myOption options pwr=all pivotdc=yes

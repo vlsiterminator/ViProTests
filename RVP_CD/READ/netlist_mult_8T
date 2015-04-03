@@ -80,7 +80,7 @@ ends triinv
 
 subckt COL BL BLB WLA CSEL CSELB NRDWR RDWR PCH RBL RBLCOL VDD VSS
 IBCA (BL BLB VDD VSS VSS RBL WLA) bitcell8T
-IBCD (BL BLB VDD VSS VSS VSS VSS) bitcell8T m=(NR - 1)
+IBCD (BL BLB VDD VSS VSS RBL VSS) bitcell8T m=(NR - 1)
 ICDA (BL BLB CSEL CSELB NRDWR PCH RDWR RBL RBLCOL VDD VSS) CD 
 //+15 to account for length of wire to periphery
 CBL (BL 0) capacitor c=cbl*(NR+15)

@@ -67,9 +67,15 @@ while( (rows <= maxRows)
             BL_sensing = "single"
 		)
         if( bcType=="8T1r1w_single_LBL" then
+          if( NLBL==2 then 
+			cpnetlist = "cp -f ./READ/netlist_one_8T1r1w_single_LBL2 netlist"
+            BL_sensing = "single"
+            Local_BL = "true"
+          else
 			cpnetlist = "cp -f ./READ/netlist_one_8T1r1w_single_LBL netlist"
             BL_sensing = "single"
             Local_BL = "true"
+            )
 		)
         if( bcType=="8T1r1w_diff" then
 			cpnetlist = "cp -f ./READ/netlist_one_8T1r1w_diff netlist"
@@ -97,9 +103,15 @@ while( (rows <= maxRows)
             BL_sensing = "single"
 		)
         if( bcType=="8T1r1w_single_LBL" then
+          if( NLBL==2 then 
+			cpnetlist = "cp -f ./READ/netlist_mult_8T1r1w_single_LBL2 netlist"
+            BL_sensing = "single"
+            Local_BL = "true"
+          else
 			cpnetlist = "cp -f ./READ/netlist_mult_8T1r1w_single_LBL netlist"
             BL_sensing = "single"
             Local_BL = "true"
+            )
 		)
         if( bcType=="8T1r1w_diff" then
 			cpnetlist = "cp -f ./READ/netlist_mult_8T1r1w_diff netlist"
@@ -183,8 +195,13 @@ while( (rows <= maxRows)
     ;;Modified the equation of PCH buf energy by adding a part for IPCH_buf.2015/1/17.
 	if( colMux>1 then
       if( bcType=="8T1r1w_single_LBL" then
-        avg_pwr_hs= average(getData("ICOLD.ICOL_LBL.ICDA:pwr"))+ average(getData("ICOLD.ICOL_LBLD.ICDA:pwr"))
-        avg_pwrbc_hs= average(getData("ICOLD.ICOL_LBL.IBCA:pwr"))+ average(getData("ICOLD.ICOL_LBLD.IBCA:pwr"))
+        if(NLBL==2 then
+        avg_pwr_hs= average(getData("ICOLD.ICOL_LBL.ICDA:pwr"))+ average(getData("ICOLD.ICOL_LBL2.ICDA:pwr"))
+        avg_pwrbc_hs= average(getData("ICOLD.ICOL_LBL.IBCA:pwr")) + average(getData("ICOLD.ICOL_LBL2.IBCA:pwr"))
+       else
+        avg_pwr_hs= average(getData("ICOLD.ICOL_LBL.ICDA:pwr"))+ average(getData("ICOLD.ICOL_LBLD.ICDA:pwr"))+ average(getData("ICOLD.ICOL_LBL2.ICDA:pwr"))
+        avg_pwrbc_hs= average(getData("ICOLD.ICOL_LBL.IBCA:pwr"))+ average(getData("ICOLD.ICOL_LBLD.IBCA:pwr")) + average(getData("ICOLD.ICOL_LBL2.IBCA:pwr"))
+        )
       else
 		avg_pwr_hs = average(getData("ICOLD.ICDA:pwr"))
 		avg_pwrbc_hs = average(getData("ICOLD.IBCA:pwr"))
@@ -272,9 +289,14 @@ while( (rows <= maxRows)
 		dly_pch_lbl=cross(v("ICOL1.ICOL_LBL.RBL_LBL") VDD*.95 1 'rising) - cross(v("PCH") VDD/2 1 'falling)
 		dly_pch_gbl=cross(v("RBL_GBL") VDD*.95 1 'rising) - cross(v("PCH") VDD/2 1 'falling)
 		dly_pch_r=max(dly_pch_gbl,dly_pch_lbl)
-        avg_pwr_r= average(getData("ICOL1.ICOL_LBL.ICDA:pwr"))+ average(getData("ICOL1.ICOL_LBLD.ICDA:pwr"))
-        avg_pwrbc_r= average(getData("ICOL1.ICOL_LBL.IBCA:pwr"))+ average(getData("ICOL1.ICOL_LBLD.IBCA:pwr"))
-    avg_pwr_colbuf=  average(getData("ICOL1_buf:pwr"))
+        if(NLBL==2 then
+        avg_pwr_r= average(getData("ICOL1.ICOL_LBL.ICDA:pwr"))+ average(getData("ICOL1.ICOL_LBL2.ICDA:pwr"))
+        avg_pwrbc_r= average(getData("ICOL1.ICOL_LBL.IBCA:pwr"))+ average(getData("ICOL1.ICOL_LBL2.IBCA:pwr"))
+        else
+        avg_pwr_r= average(getData("ICOL1.ICOL_LBL.ICDA:pwr"))+ average(getData("ICOL1.ICOL_LBLD.ICDA:pwr"))+ average(getData("ICOL1.ICOL_LBL2.ICDA:pwr"))
+        avg_pwrbc_r= average(getData("ICOL1.ICOL_LBL.IBCA:pwr"))+ average(getData("ICOL1.ICOL_LBLD.IBCA:pwr"))+ average(getData("ICOL1.ICOL_LBL2.IBCA:pwr"))
+        )
+    avg_pwr_colbuf=  average(getData("ICOL1_buf:pwr"))+ average(getData("IGBL_SEL:pwr"))
     avg_csel_inter=average(getData("ICSELB:pwr"))
 	energycd_r = <ws>*(avg_pwr_r+avg_pwr_hs+avg_pwr_colbuf)*1.3*<tper>
 	energybc_r = <ws>*(avg_pwrbc_r+avg_pwrbc_hs)*1.3*<tper>

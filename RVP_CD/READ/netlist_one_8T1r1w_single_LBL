@@ -73,7 +73,7 @@ parameters wncs=wdef lncs=ldef wpcs=wdef lpcs=ldef wpch=2*wdef lpch=ldef
 M7 (RBL_LBL PCH VDD VDD) P_TRANSISTOR width=wpch length=lpch
 M6 (RBL_GBL PCH VDD VDD) P_TRANSISTOR width=wdef length=lpch
 I0 (CSELB RBL_LBL RBL_int VDD VSS) nor2
-M8 (RBL_GBL RBL_int VSS VSS) N_TRANSISTOR width=wncs length=lncs 
+M8 (RBL_GBL RBL_int VSS VSS) N_TRANSISTOR width=4*wdef length=lncs 
 ends CD
 // End of subcircuit definition.
 
@@ -102,9 +102,10 @@ ICDA (CSELB PCH RBL_LBL RBL_GBL VDD VSS) CD
 CRBL (RBL_LBL 0) capacitor c=cbl*(NRLBL+5)
 ends COL_LBL
 
-subckt COL WLA CSELB PCH RBL_GBL VDD VSS
-ICOL_LBL (WLA CSELB PCH RBL_GBL VDD VSS) COL_LBL
-ICOL_LBLD (VSS CSELB PCH RBL_GBL VDD VSS) COL_LBL m=(NLBL - 1)
+subckt COL WLA CSELB PCH RBL_GBL1 RBL_GBL2 VDD VSS
+ICOL_LBL (WLA CSELB PCH RBL_GBL1 VDD VSS) COL_LBL
+ICOL_LBLD (VSS CSELB PCH RBL_GBL1 VDD VSS) COL_LBL m=(NLBL/2 - 1)
+ICOL_LBL2 (VSS CSELB PCH RBL_GBL2 VDD VSS) COL_LBL m=NLBL/2
 //+5 to account for length of wire to periphery
 //CRBL (RBL_GBL 0) capacitor c=cbl*(NR+5)
 ends COL
@@ -116,10 +117,12 @@ I3 (OUT X1 VDD VSS) INV i=4
 ends buf2
 
 //BC and CD
-ICOL1 (WLA CSELB PCH RBL_GBL VDD VSS) COL
+ICOL1 (WLA CSELB PCH RBL_GBL1 RBL_GBL2 VDD VSS) COL
 //Added buffer for RBLCOL to drive the input cap of bankmux
-ICOL1_buf (RBL_GBL RBLBM VDD VSS) buf2
-capGBL (RBL_GBL 0) capacitor c=cbl*(NR+5)
+IGBL_SEL (RBL_GBL1 RBL_GBL2 RBL_GBL VDD VSS) nand2
+ICOL1_buf (RBLBM RBL_GBL VDD VSS) INV i=4
+capGBL1 (RBL_GBL1 0) capacitor c=cbl*(NR/2+3)
+capGBL2 (RBL_GBL2 0) capacitor c=cbl*(NR/2+3)
 
 //Added the CSEL cap; gate cap is half of differential BL.
 //capCSEL (CSEL 0) capacitor c=ws*cwl*colMux+wdef*cg*1e6*(ws-1)*NLBL
@@ -168,5 +171,5 @@ ic ICOL1.ICOL_LBLD.IBCA.Q=0 ICOL1.ICOL_LBLD.IBCD.Q=pvdd
 ic ICOL1.ICOL_LBL.IBCA.mid=0 ICOL1.ICOL_LBL.IBCD.mid=0 
 ic ICOL1.ICOL_LBLD.IBCA.mid=0 ICOL1.ICOL_LBLD.IBCD.mid=0 
 ic ICOL1.ICOL_LBL.RBL_LBL=pvdd ICOL1.ICOL_LBLD.RBL_LBL=pvdd
-ic RBLBM=pvdd RBL_GBL=pvdd
+ic RBLBM=pvdd RBL_GBL1=pvdd RBL_GBL2=pvdd
 myOption options pwr=all pivotdc=yes
