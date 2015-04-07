@@ -440,12 +440,12 @@ while( (rows <= maxRows)
 	selectResult('tran)
 	
     if(Local_BL == "true" then
-	delay_inter_w =cross(v("WEN") VDD*.05 1 'rising) - cross(v("WEN_IN") VDD/2 1 'rising)
-    dly_lbl_sel_int = cross(v("ICOL1.ICOL_LBL.ICDA.LBL_SELB") VDD/2 1 'rising) - cross(v("LBL_SEL_IN") VDD/2 1 'rising)
+	delay_inter_wen =cross(v("WEN") VDD*.05 1 'rising) - cross(v("WEN_IN") VDD/2 1 'rising)
+    dly_lbl_sel_int = cross(v("ICOL1.ICOL_LBL.ICDA.LBL_SELB") VDD/2 1 'falling) - cross(v("LBL_SEL_IN") VDD/2 1 'rising)
     dly_gbl_w = cross(v("GBLB") VDD/2 1 'falling) - cross(v("WEN") VDD*.05 1 'rising)
-    ;; The delay of data preparation should be the larger one between gbl being ready and lbl_sel being ready.
-    dly_data_prep = max(delay_inter_w + dly_gbl_w, dly_lbl_sel_int)
-    ;; The delay of write driver should start from WEN being ready to LBLB being ready.
+    ;; The delay of data preparation should be the larger one between gbl being ready and lbl_selb being ready.
+    delay_inter_w = max(delay_inter_wen + dly_gbl_w, dly_lbl_sel_int)
+    ;; The delay of write driver should start from both lbl_sel and gbl being ready to LBLB being ready.
     dly_writeDriver = cross(v("ICOL1.ICOL_LBL.LBLB") VDD*.05 1 'falling) - cross(v("LBL_SEL_IN") VDD/2 1 'rising)- delay_inter_w
     ;; The precharge delay should be the larger one between lbl and gbl
     dly_lbl_pch = cross(v("ICOL1.ICOL_LBL.LBLB") VDD*.95 1 'rising) - cross(v("PCH") VDD/2 1 'falling)

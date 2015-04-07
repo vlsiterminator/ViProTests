@@ -67,7 +67,7 @@ M5 (LBLB PCH VDD VDD) P_TRANSISTOR width=wpch length=lpch
 M6 (LBL PCH LBLB VDD) P_TRANSISTOR width=wpch length=lpch
 I0 (LBL_SELB LBL_SEL VDD VSS) INV i=1
 I1 (LBL_SELB GBL LBL_drv1 VDD VSS) nor2 wp=3*wdef
-M7 (VSS LBL_drv1 LBL VSS) N_TRANSISTOR width=6*wdef length=ldef
+M7 (VSS LBL_drv1 LBL VSS) N_TRANSISTOR width=10*wdef length=ldef
 I2 (LBL_SELB GBLB LBL_drv2 VDD VSS) nor2 wp=3*wdef
 M8 (VSS LBL_drv2 LBLB VSS) N_TRANSISTOR width=10*wdef length=ldef
 ends CD
