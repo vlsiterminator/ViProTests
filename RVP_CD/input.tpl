@@ -473,8 +473,8 @@ while( (rows <= maxRows)
 	; half-selected col cd and bitcell power if col-mux present
 	if( colMux > 1 then
       if( Local_BL == "true" then
-		avg_pwr_hs = average(getData("ICOLD.ICOL_LBL.ICDA:pwr")) + average(getData("ICOLD.ICOL_LBLD.ICDA:pwr"))
-		avg_pwrbc_hs = average(getData("ICOLD.ICOL_LBL.IBCA:pwr")) + average(getData("ICOLD.ICOL_LBLD.IBCA:pwr"))
+		avg_pwr_hs = average(getData("ICOLD.ICOL_LBL.ICDA:pwr")) + average(getData("ICOLD.ICOL_LBLD.ICDA:pwr"))+ average(getData("ICOL1.ICOL_LBLD.ICDA:pwr"))
+		avg_pwrbc_hs = average(getData("ICOLD.ICOL_LBL.IBCA:pwr")) + average(getData("ICOLD.ICOL_LBLD.IBCA:pwr"))+ average(getData("ICOL1.ICOL_LBLD.IBCA:pwr"))
       else
 		avg_pwr_hs = average(getData("ICOLD.ICDA:pwr"))
 		avg_pwrbc_hs = average(getData("ICOLD.IBCA:pwr"))
