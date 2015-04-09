@@ -151,7 +151,7 @@ VWLA (WLA 0) vsource type=pulse val0=0 val1=pvdd+WLOffset rise=trf fall=trf widt
 
 //Make CSEL and CSELB the same as WLA
 //VCSEL (CSEL_IN 0) vsource type=pulse val0=0 val1=pvdd rise=trf fall=trf width=twl period=tper*3 delay=tdly
-VCSELB (CSELB_IN 0) vsource type=pulse val0=pvdd val1=0 rise=trf fall=trf width=twl period=tper*3 delay=tdly
+VCSELB (CSELB_IN 0) vsource type=pulse val0=pvdd val1=0 rise=trf fall=trf width=twl+tdly/2 period=tper*3 delay=tdly/2
 //VCSEL (CSEL 0) vsource dc=0
 //VCSELB (CSELB 0) vsource dc=pvdd
 
