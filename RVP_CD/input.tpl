@@ -425,13 +425,13 @@ while( (rows <= maxRows)
 	;; calculate bitcell flip energy	
     if(Local_BL == "true" then
 	avg_pwrbc_w = average(getData("ICOL1.ICOL_LBL.IBCA:pwr"))
-	dly_bcwr = cross((v("ICOL1.ICOL_LBL.IBCA.Q")-v("ICOL1.ICOL_LBL.IBCA.QB")) .001 1 'rising) - cross(v("WLA") VDD/2 1 'rising)
+	dly_bcwr = cross((v("ICOL1.ICOL_LBL.IBCA.Q")-v("ICOL1.ICOL_LBL.IBCA.QB")) 0.9*VDD 1 'rising) - cross(v("WLA") VDD/2 1 'rising)
     else
 	avg_pwrbc_w = average(getData("ICOL1.IBCA:pwr"))
 	; Bitcell flip delay
 	;;dly_bcwr = cross(v("ICOL1.IBCA.Q") VDD/2 1 'rising) - cross(v("WLA") VDD/2 1 'rising)
     ;;Use the time when Q=QB as the critiria of data flip. Modified at 10/28/2014.
-	dly_bcwr = cross((v("ICOL1.IBCA.Q")-v("ICOL1.IBCA.QB")) .001 1 'rising) - cross(v("WLA") VDD/2 1 'rising)
+	dly_bcwr = cross((v("ICOL1.IBCA.Q")-v("ICOL1.IBCA.QB")) 0.9*VDD 1 'rising) - cross(v("WLA") VDD/2 1 'rising)
     )
 	; run analysis with enough WL pulse to just write, to prevent half-selected cells swinging full rail
 	desVar("twl" dly_bcwr)
