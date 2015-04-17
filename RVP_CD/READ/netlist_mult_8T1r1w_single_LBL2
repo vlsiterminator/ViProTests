@@ -107,6 +107,7 @@ ICOL_LBL (WLA CSELB PCH RBL_GBL1 VDD VSS) COL_LBL
 ICOL_LBL2 (VSS CSELB PCH RBL_GBL2 VDD VSS) COL_LBL m=NLBL/2
 //+5 to account for length of wire to periphery
 //CRBL (RBL_GBL 0) capacitor c=cbl*(NR+5)
+CPCHCOL (PCH 0) capacitor c=cwl
 ends COL
 
 // Cell name :buf2

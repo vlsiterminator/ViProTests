@@ -88,6 +88,7 @@ ICDA (CSEL CSELB PCH RBL RBLCOL VDD VSS) CD
 //CBL (BL 0) capacitor c=cbl*(NR+15)
 //CBLB (BLB 0) capacitor c=cbl*(NR+15)
 CRBL (RBL 0) capacitor c=cbl*(NR+15)
+CPCHCOL (PCH 0) capacitor c=cwl
 ends COL
 
 // Cell name :buf2

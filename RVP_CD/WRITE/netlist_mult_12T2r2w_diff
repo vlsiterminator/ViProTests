@@ -85,6 +85,7 @@ IBCD (BL BLB VDD VSS VSS) bitcell m=(NR - 1)
 ICDA (BL BLB CSEL CSELB NRDWR PCH RDWR VDD VSS) CD 
 CBL (BL 0) capacitor c=cbl*(NR+15)
 CBLB (BLB 0) capacitor c=cbl*(NR+15)
+CPCHCOL (PCH 0) capacitor c=cwl
 ends COL
 
 //BC and CD

@@ -69,6 +69,7 @@ ICDA (BL BLB CSEL CSELB NRDWR PCH RDWR VDD VSS) CD
 //+15 to account for length of wire to periphery
 CBL (BL 0) capacitor c=cbl*(NR+15) 
 CBLB (BLB 0) capacitor c=cbl*(NR+15)
+CPCHCOL (PCH 0) capacitor c=cwl
 ends COL
 
 // Cell name: triinv
